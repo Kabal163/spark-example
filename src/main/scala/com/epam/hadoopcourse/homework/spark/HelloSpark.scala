@@ -20,10 +20,12 @@ object HelloSpark {
       .groupByKey(train => (train.hotel_continent, train.hotel_country, train.hotel_market))
       .count()
       .sort($"count(1)".desc)
+      .map(train => ResultOfTask1(train._1._1, train._1._2, train._1._3, train._2))
       .take(3)
 
-    spark.createDataset(result).write.json("/user/root/task1.json")
+    spark.createDataset(result).write.json(args(1))
   }
+
 
   case class TrainModel(date_time: String,
                         site_name: Int,
@@ -49,4 +51,9 @@ object HelloSpark {
                         hotel_country: Option[Int],
                         hotel_market: Option[Int],
                         hotel_cluster: Option[Int])
+
+  case class ResultOfTask1(hotel_continent: Option[Int],
+                           hotel_country: Option[Int],
+                           hotel_market: Option[Int],
+                           cnt: Long)
 }
