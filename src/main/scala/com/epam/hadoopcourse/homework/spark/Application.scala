@@ -3,7 +3,7 @@ package com.epam.hadoopcourse.homework.spark
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Dataset, SparkSession}
 
-object HelloSpark {
+object Application {
 
   def main(args: Array[String]): Unit = {
 
