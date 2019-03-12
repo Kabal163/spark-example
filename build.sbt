@@ -1,4 +1,4 @@
-name := "spark-scala"
+name := "spark-task1"
 
 version := "0.1"
 
