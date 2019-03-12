@@ -17,10 +17,11 @@ object Application {
 
     val result = ds
       .filter(_.srch_adults_cnt.get == 2)
-      .groupByKey(train => (train.hotel_continent, train.hotel_country, train.hotel_market))
+      .groupByKey(tModel => (tModel.hotel_continent, tModel.hotel_country, tModel.hotel_market))
       .count()
       .sort($"count(1)".desc)
-      .map(train => ResultOfTask1(train._1._1, train._1._2, train._1._3, train._2))
+      .map(tModel => ResultOfTask1(tModel._1._1, tModel._1._2, tModel._1._3, tModel._2))
+      .coalesce(1)
       .take(3)
 
     spark.createDataset(result).write.json(args(1))
