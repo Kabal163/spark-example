@@ -8,7 +8,7 @@ object Application {
   def main(args: Array[String]): Unit = {
 
     val conf: SparkConf = new SparkConf()
-      .setAppName("HelloSpark")
+      .setAppName("spark-task1")
 
     val spark: SparkSession = SparkSession.builder().config(conf).getOrCreate()
     import spark.implicits._
