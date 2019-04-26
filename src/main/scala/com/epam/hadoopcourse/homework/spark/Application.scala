@@ -1,7 +1,7 @@
 package com.epam.hadoopcourse.homework.spark
 
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.{SparkConf, SparkContext}
 
 object Application {
 
@@ -10,22 +10,28 @@ object Application {
     val conf: SparkConf = new SparkConf()
       .setAppName("spark-task1")
 
-    val spark: SparkSession = SparkSession.builder().config(conf).getOrCreate()
-    import spark.implicits._
+    val sc = SparkContext.getOrCreate(conf)
+    val sqlContext = new SQLContext(sc)
 
-    val ds: Dataset[TrainModel] = spark.read.parquet(args(0)).as[TrainModel]
+    val df: DataFrame = sqlContext.read.parquet(args(0))
+    df.registerTempTable("train")
 
-    val result = ds
-      .filter(_.srch_adults_cnt.get == 2)
-      .groupByKey(tModel => (tModel.hotel_continent, tModel.hotel_country, tModel.hotel_market))
-      .count()
-      .sort($"count(1)".desc)
-      .map(tModel => ResultOfTask1(tModel._1._1, tModel._1._2, tModel._1._3, tModel._2))
-      .coalesce(1)
-      .take(3)
+    val result = sqlContext.sql(query)
 
-    spark.createDataset(result).write.json(args(1))
+    result.write.json(args(1))
   }
+
+  val query = "SELECT hotel_continent,\n" +
+    "                 hotel_country,\n" +
+    "                 hotel_market,\n" +
+    "                 COUNT(*)\n" +
+    "            FROM train\n" +
+    "           WHERE srch_adults_cnt = 2\n" +
+    "           GROUP BY hotel_continent,\n" +
+    "                    hotel_country,\n" +
+    "                    hotel_market\n" +
+    "           ORDER BY COUNT(*) DESC\n" +
+    "           LIMIT 3\n"
 
 
   case class TrainModel(date_time: String,
@@ -56,5 +62,5 @@ object Application {
   case class ResultOfTask1(hotel_continent: Option[Int],
                            hotel_country: Option[Int],
                            hotel_market: Option[Int],
-                           cnt: Long)
+                           count: Long)
 }
