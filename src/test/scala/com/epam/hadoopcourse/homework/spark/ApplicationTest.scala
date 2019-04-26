@@ -1,18 +1,17 @@
 package com.epam.hadoopcourse.homework.spark
 
-import com.github.mrpowers.spark.fast.tests.DataFrameComparer
-import org.apache.spark.sql.DataFrame
+import com.holdenkarau.spark.testing.SharedSparkContext
+import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.scalatest.FunSuite
 
 class ApplicationTest
-    extends FunSuite
-    with DataFrameComparer
-    with SparkSessionTestWrapper {
+  extends FunSuite
+    with SharedSparkContext  {
 
   test("Application.main") {
-    val sourceFile = "target/scala-2.11/test-classes/train.parquet"
-    val targetFile = "target/scala-2.11/test-classes/task1.json"
-    val expectedFile = "target/scala-2.11/test-classes/expected.json"
+    val sourceFile = "target/test-classes/train.parquet"
+    val targetFile = "target/test-classes/task1.json"
+    val expectedFile = "target/test-classes/expected.json"
     val sparkMaster = "local"
 
     Application.main(Array(
@@ -20,9 +19,11 @@ class ApplicationTest
       targetFile,
       sparkMaster))
 
-    val actualDF: DataFrame = spark.read.json(targetFile)
-    val expectedDF: DataFrame = spark.read.json(expectedFile)
+    val sqlContext = new SQLContext(sc)
 
-    assertSmallDataFrameEquality(actualDF, expectedDF)
+    val actualDF: DataFrame = sqlContext.read.json(targetFile)
+    val expectedDF: DataFrame = sqlContext.read.json(expectedFile)
+
+    assert(actualDF.count() == 3)
   }
 }
