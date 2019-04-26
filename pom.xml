@@ -127,5 +127,12 @@
             <id>spark-repo</id>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>myMavenRepo.write</id>
+            <url>https://mymavenrepo.com/repo/g7CqK629B11DQtWpM3gN/</url>
+        </repository>
+    </distributionManagement>
     
 </project>
